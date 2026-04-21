@@ -19,6 +19,6 @@ public interface WarehouseStockRepository extends JpaRepository<WarehouseStock, 
     @Query("SELECT SUM(ws.stock) FROM WarehouseStock ws WHERE ws.produk.skuCode = :sku AND ws.produk.isActive = true")
     Integer hitungTotalStok(@Param("sku") String sku);
 
-    @Query("SELECT new LowStockResponse(p.skuCode, p.name, w.code, w.name, ws.stock) FROM WarehouseStock ws JOIN ws.produk p JOIN ws.warehouse w WHERE p.isActive = true AND ws.stock < 10 ORDER BY ws.stock ASC")
+    @Query("SELECT new mini_.projek_guna.response.LowStockResponse(p.skuCode, p.name, w.code, w.name, ws.stock) FROM WarehouseStock ws JOIN ws.produk p JOIN ws.warehouse w WHERE p.isActive = true AND ws.stock < 10 ORDER BY ws.stock ASC")
     List<LowStockResponse> findLowStockProducts();
 }

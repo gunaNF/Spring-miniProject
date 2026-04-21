@@ -58,4 +58,14 @@ public class GlobalException {
                         .data(null)
                         .build());
     }
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<WebResponse<Object>> handleRuntime(RuntimeException ex){
+    return  ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+            WebResponse.<Object>builder()
+                    .status("Error")
+                    .message(ex.getMessage())
+                    .data(null)
+                    .build()
+    );
+    }
 }

@@ -35,15 +35,11 @@ public class WarehouseService {
     // UPDATE
     @Transactional
     public Warehouse updateWarehouse(Long id, WarehouseRequest request) {
-        Warehouse warehouse = warehouseRepository.findById(id)
-                .orElseThrow(() -> new ValidasiException("Warehouse tidak ditemukan"));
+        if (warehouseRepository.existsByCodeAndIdNot(request.getCode(), id)){
+            throw new IllegalArgumentException("kode gudang sudah digunakan: " +request.getCode());
+        }
 
-        warehouseRepository.findByCode(request.getCode())
-                .filter(existing -> !existing.getId().equals(id))
-                .ifPresent(existing -> {
-                    throw new ValidasiException("Kode gudang sudah terdaftar");
-                });
-
+        Warehouse warehouse = warehouseRepository.findById(id).orElseThrow(()-> new ValidasiException("Warehouse tidak ditemukan dengan id " + id));
         warehouse.setCode(request.getCode());
         warehouse.setName(request.getName());
         return warehouseRepository.save(warehouse);

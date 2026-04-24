@@ -40,18 +40,6 @@ public class GlobalException {
     }
 
 
-
-
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<WebResponse<String>> handleRuntimeException(RuntimeException e) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(WebResponse.<String>builder()
-                        .status("Error")
-                        .message(e.getMessage())
-                        .data(null)
-                        .build());
-    }
-
     @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
     public ResponseEntity<WebResponse<String>> handleOptimisticLocking(OptimisticLockingFailureException e){
         return ResponseEntity.status(HttpStatus.CONFLICT)

@@ -3,6 +3,7 @@ package mini_.projek_guna.service;
 import jakarta.transaction.Transactional;
 import mini_.projek_guna.Repository.CategoryRepository;
 import mini_.projek_guna.Repository.ProdukRepository;
+import mini_.projek_guna.Repository.StockMutationRepository;
 import mini_.projek_guna.Repository.WarehouseStockRepository;
 import mini_.projek_guna.Exception.ValidasiException;
 import mini_.projek_guna.model.Category;
@@ -21,11 +22,13 @@ public class ProdukService {
     private final ProdukRepository produkRepository;
     private final CategoryRepository categoryRepository;
     private final WarehouseStockRepository warehouseStockRepository;
+    private final StockMutationRepository stockMutationRepository;
 
-    public ProdukService(ProdukRepository produkRepository, CategoryRepository categoryRepository, WarehouseStockRepository warehouseStockRepository) {
+    public ProdukService(ProdukRepository produkRepository, CategoryRepository categoryRepository, WarehouseStockRepository warehouseStockRepository,StockMutationRepository stockMutationRepository) {
         this.produkRepository = produkRepository;
         this.categoryRepository = categoryRepository;
         this.warehouseStockRepository = warehouseStockRepository;
+        this.stockMutationRepository = stockMutationRepository;
     }
 
     // 1. CREATE: Tambah Produk Baru
@@ -84,6 +87,7 @@ public class ProdukService {
         Produk produk = produkRepository.findById(id)
                 .orElseThrow(() -> new ValidasiException("Product tidak ditemukan"));
 
+
         produk.setIsActive(false);
         produkRepository.save(produk);
     }
@@ -115,5 +119,21 @@ public class ProdukService {
         Produk produk = getActiveBySku(skuCode);
         Integer totalStock = warehouseStockRepository.hitungTotalStok(skuCode);
         return new StockSummaryResponse(produk.getSkuCode(), totalStock == null ? 0 : totalStock);
+    }
+
+    @Transactional
+    public void hapusProdukTotal(Long id) {
+        Produk produk = produkRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Produk tidak ditemukan!"));
+
+        if (produk.getIsActive()) { // Jika true
+            throw new RuntimeException("Produk masih aktif! Nonaktifkan dulu sebelum dihapus total.");
+        }
+
+        stockMutationRepository.setProdukNullByProdukId(id);
+
+        warehouseStockRepository.deleteByProdukId(id);
+
+        produkRepository.delete(produk);
     }
 }

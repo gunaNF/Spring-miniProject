@@ -12,4 +12,5 @@ public interface ProdukRepository extends JpaRepository<Produk,Long> {
 
     Optional<Produk> findBySkuCodeAndIsActiveTrue(String skuCode);
     java.util.List<Produk> findAllByIsActiveTrue();
+
 }

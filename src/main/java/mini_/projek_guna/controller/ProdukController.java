@@ -8,6 +8,8 @@ import mini_.projek_guna.response.LowStockResponse;
 import mini_.projek_guna.response.StockSummaryResponse;
 import mini_.projek_guna.response.WebResponse;
 import mini_.projek_guna.service.ProdukService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -95,4 +97,22 @@ public class ProdukController {
                 .data(produkService.getStockSummary(sku))
                 .build();
     }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<WebResponse<String>> deleteProduk(@PathVariable Long id) {
+        try {
+            produkService.hapusProdukTotal(id);
+
+            return ResponseEntity.ok(WebResponse.<String>builder()
+                    .status("OK")
+                    .data("Success: Produk, stok dihapus, dan riwayat mutasi di-set null.")
+                    .build());
+
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(WebResponse.<String>builder()
+                    .status("FAILED")
+                    .data(e.getMessage())
+                    .build());
+        }
+    }
+
 }
